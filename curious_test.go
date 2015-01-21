@@ -1,6 +1,10 @@
 package curious
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+	"unsafe"
+)
 
 // Looks like if we append endlessly, we're given new backing arrays.
 func BenchmarkEndlessAppend(t *testing.B) {
@@ -11,4 +15,14 @@ func BenchmarkEndlessAppend(t *testing.B) {
 			sl = sl[len(sl)/2:]
 		}
 	}
+}
+
+// Is a zero value slice the same as a nil slice of the same type?
+func TestSliceZeroValue(t *testing.T) {
+	sl := []byte{}
+	p := (*reflect.SliceHeader)(unsafe.Pointer(&sl))
+	t.Log(*p)
+	var sl1 []byte
+	p = (*reflect.SliceHeader)(unsafe.Pointer(&sl1))
+	t.Log(*p)
 }

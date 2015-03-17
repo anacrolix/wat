@@ -42,3 +42,34 @@ func TestRangeAlterIndex(t *testing.T) {
 	t.Log(c)
 }
 
+type realSlimShady struct{}
+
+func (realSlimShady) StandUp()    {}
+func (realSlimShady) Cross8Mile() {}
+
+type slimShady interface {
+	StandUp()
+	// Only the real Slim Shady can cross 8 Mile
+	Cross8Mile()
+}
+
+// Posers can stand up
+type poser interface {
+	StandUp()
+}
+
+// Eminem looks like a poser
+type eminem struct {
+	poser
+}
+
+func TestAssertComposedType(t *testing.T) {
+	// Eminem implements poser, but he's the real Shady
+	var realShady poser = eminem{realSlimShady{}}
+	// He should be able to cross 8 Mile.
+	_, ok := realShady.(slimShady)
+	if ok {
+		// If he can, Go has changed.
+		t.FailNow()
+	}
+}

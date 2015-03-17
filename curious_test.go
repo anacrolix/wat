@@ -26,3 +26,19 @@ func TestSliceZeroValue(t *testing.T) {
 	p = (*reflect.SliceHeader)(unsafe.Pointer(&sl1))
 	t.Log(*p)
 }
+
+// Range takes it's own slice reference. i is reset every time around the
+// loop.
+func TestRangeAlterIndex(t *testing.T) {
+	b := []byte{'a', 'b', 'c'}
+	var c []byte
+	for i, j := range b {
+		b = nil
+		t.Log(i, j)
+		i--
+		t.Log(i)
+		c = append(c, 'd'+byte(i))[1:]
+	}
+	t.Log(c)
+}
+

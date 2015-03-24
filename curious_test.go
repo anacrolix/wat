@@ -2,6 +2,7 @@ package curious
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 	"unsafe"
 )
@@ -72,4 +73,16 @@ func TestAssertComposedType(t *testing.T) {
 		// If he can, Go has changed.
 		t.FailNow()
 	}
+}
+
+func TestMakesliceNegative(t *testing.T) {
+	var l int64
+	l = -1
+	defer func() {
+		r := recover()
+		if !strings.Contains(r.(error).Error(), "len out of range") {
+			t.FailNow()
+		}
+	}()
+	_ = make([]byte, l)
 }

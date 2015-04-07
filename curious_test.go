@@ -86,3 +86,22 @@ func TestMakesliceNegative(t *testing.T) {
 	}()
 	_ = make([]byte, l)
 }
+
+// See if named returned values are set even if return values are all
+// specified in the return statement. It seems that they are.
+func TestDirectReturnSetsNamedValues(t *testing.T) {
+	var intercepted bool
+	f := func() (named bool) {
+		defer func() {
+			// Saved the named return value.
+			intercepted = named
+		}()
+		// Bypass the named return value.
+		return true
+	}
+	f()
+	t.Log(intercepted)
+	if intercepted != true {
+		t.FailNow()
+	}
+}

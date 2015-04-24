@@ -1,10 +1,13 @@
 package curious
 
 import (
+	"math/rand"
 	"reflect"
 	"strings"
 	"testing"
 	"unsafe"
+
+	"github.com/bradfitz/iter"
 )
 
 // Looks like if we append endlessly, we're given new backing arrays.
@@ -103,5 +106,37 @@ func TestDirectReturnSetsNamedValues(t *testing.T) {
 	t.Log(intercepted)
 	if intercepted != true {
 		t.FailNow()
+	}
+}
+
+var constantSlice = []string{"a", "b", "c", "d", "e"}
+
+func sliceIndex(i int) string {
+	return []string{"a", "b", "c", "d", "e"}[i]
+}
+
+func arrayIndex(i int) string {
+	return [...]string{"a", "b", "c", "d", "e"}[i]
+}
+
+func BenchmarkConstantIndex(b *testing.B) {
+	for range iter.N(b.N) {
+		constantIndex(rand.Intn(5))
+	}
+}
+
+func constantIndex(i int) string {
+	return constantSlice[i]
+}
+
+func BenchmarkSliceIndex(b *testing.B) {
+	for range iter.N(b.N) {
+		sliceIndex(rand.Intn(5))
+	}
+}
+
+func BenchmarkArrayIndex(b *testing.B) {
+	for range iter.N(b.N) {
+		arrayIndex(rand.Intn(5))
 	}
 }

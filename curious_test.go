@@ -1,6 +1,7 @@
 package curious
 
 import (
+	"fmt"
 	"math/rand"
 	"mime"
 	"reflect"
@@ -11,6 +12,7 @@ import (
 	"unsafe"
 
 	"github.com/bradfitz/iter"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -228,4 +230,9 @@ func TestFmtF(t *testing.T) {
 	t.Logf("%+q", '\xcf')
 	t.Logf("%#q", '\xcf')
 	t.Logf("%q", '\xcf')
+}
+
+func TestFmtDFloat(t *testing.T) {
+	var f float64 = 42.123
+	assert.EqualValues(t, "42", fmt.Sprintf("%d", int(f)))
 }

@@ -2,6 +2,7 @@ package curious
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"mime"
 	"reflect"
@@ -20,7 +21,7 @@ import (
 func BenchmarkEndlessAppend(t *testing.B) {
 	for range make([]struct{}, t.N) {
 		sl := make([]int, 0x10000)
-		for i := 0; i < 0x10000; i++ {
+		for i := 0; i < 0x100; i++ {
 			sl = append(sl, make([]int, 0x10000)...)
 			sl = sl[len(sl)/2:]
 		}
@@ -235,4 +236,67 @@ func TestFmtF(t *testing.T) {
 func TestFmtDFloat(t *testing.T) {
 	var f float64 = 42.123
 	assert.EqualValues(t, "42", fmt.Sprintf("%d", int(f)))
+}
+
+func TestInt64Wrap(t *testing.T) {
+	a := int64(1)
+	a += math.MaxInt64
+	assert.True(t, a < 0)
+}
+
+func TestReflectCustomTypes(t *testing.T) {
+	type A []byte
+	assert.Equal(t, reflect.Slice, reflect.TypeOf(A{}).Kind())
+}
+
+type A [1]byte
+
+func (me A) Bytes() []byte { return me[:] }
+
+type B A
+
+func TestTypedefExposedMethods(t *testing.T) {
+	b := B{}
+	A(b).Bytes()
+	// b.Bytes()
+}
+
+// Ensure that appending a slice to a nil slice produces a new backing array.
+func TestAppendNilBytesNewBacking(t *testing.T) {
+	a := []byte{1, 2, 3}
+	b := append([]byte(nil), a...)
+	assert.EqualValues(t, a, b)
+	b[1] = 4
+	assert.NotEqual(t, a, b)
+	t.Log(a)
+	t.Log(b)
+}
+
+const backingArraySliceSrcLen = 100000
+
+func BenchmarkNewBackingArrayNil(b *testing.B) {
+	for range iter.N(b.N) {
+		_ = append([]byte(nil), make([]byte, backingArraySliceSrcLen)...)
+	}
+}
+
+func BenchmarkNewBackingArrayWithCap(b *testing.B) {
+	for range iter.N(b.N) {
+		_ = append(make([]byte, 0, backingArraySliceSrcLen), make([]byte, backingArraySliceSrcLen)...)
+	}
+}
+
+func BenchmarkNewBackingArrayCopy(b *testing.B) {
+	for range iter.N(b.N) {
+		copy(make([]byte, backingArraySliceSrcLen), make([]byte, backingArraySliceSrcLen))
+	}
+}
+
+func TestFormatMap(t *testing.T) {
+	t.Logf("%#v", "hiya")
+	t.Logf("%v", map[string]int{"hello": 42})
+	t.Logf("%+v", struct {
+		A string
+		B int
+	}{"{hello world}", 42})
 }

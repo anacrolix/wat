@@ -6,15 +6,12 @@ import (
 	"math/rand"
 	"mime"
 	"reflect"
-	"runtime"
 	"strings"
-	"sync"
 	"testing"
 	"unsafe"
 
 	"github.com/bradfitz/iter"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 // Looks like if we append endlessly, we're given new backing arrays.
@@ -172,20 +169,6 @@ func TestExtensionMimeTypes(t *testing.T) {
 	t.Log(mime.TypeByExtension(".ogv"))
 }
 
-func TestSliceStringsAllocation(t *testing.T) {
-	b := make([]byte, 1000000000)
-	for i := range b {
-		b[i] = byte(i)
-	}
-	s := string(b)
-	runtime.GC()
-	var ss []string
-	for i := range iter.N(1000) {
-		ss = append(ss, s[i:])
-	}
-	// time.Sleep(30 * time.Second)
-}
-
 func touchedBytes(n int) []byte {
 	ret := make([]byte, n)
 	for i := range ret {
@@ -195,37 +178,6 @@ func touchedBytes(n int) []byte {
 }
 
 const oneGB = 1000000000
-
-func TestSlicedStringTrimmed(t *testing.T) {
-	s := string([]byte(string(touchedBytes(oneGB))[:1000]))
-	runtime.GC()
-	// time.Sleep(time.Second * 30)
-	s += ""
-}
-
-func TestSyncPoolZeroesItems(t *testing.T) {
-	p := sync.Pool{
-		New: func() interface{} {
-			return 42
-		},
-	}
-	require.EqualValues(t, 42, p.Get())
-	p.Put(1)
-	require.EqualValues(t, 1, p.Get())
-	require.EqualValues(t, 42, p.Get())
-	p.Put([]int{1, 2})
-	require.EqualValues(t, []int{1, 2}, p.Get())
-	for range iter.N(100) {
-		p.Put(make([]byte, 100000))
-	}
-	got := 0
-	for range iter.N(100) {
-		if _, ok := p.Get().([]byte); ok {
-			got++
-		}
-	}
-	t.Logf("got %d back", got)
-}
 
 func TestFmtF(t *testing.T) {
 	t.Logf("%+q", '\xcf')

@@ -5,6 +5,7 @@ import (
 	"math"
 	"math/rand"
 	"mime"
+	"net"
 	"reflect"
 	"strings"
 	"testing"
@@ -251,4 +252,50 @@ func TestFormatMap(t *testing.T) {
 		A string
 		B int
 	}{"{hello world}", 42})
+}
+
+func TestResolveBadAddress(t *testing.T) {
+	_, err := net.ResolveUDPAddr("udp", "0.131.255.145:33085")
+	t.Log(err)
+}
+
+type funcEqualityReceiver struct {
+}
+
+func (me *funcEqualityReceiver) Method() {}
+
+func TestFuncEquality(t *testing.T) {
+	a := func() {}
+	b := func() {}
+	assert.NotEqual(t, a, b)
+	assert.NotEqual(t, reflect.ValueOf(a).Pointer(), reflect.ValueOf(b).Pointer())
+	var objA funcEqualityReceiver
+	var objB funcEqualityReceiver
+	assert.NotEqual(t, objA.Method, objB.Method)
+}
+
+func TestReturnTuple(t *testing.T) {
+	f := func() (int, error) {
+		return 42, nil
+	}
+	func(...interface{}) {}(f())
+}
+
+func TestSliceLoopVariableArray(t *testing.T) {
+	var b [][]byte
+	c := map[[1]byte]int{{1}: 1, {2}: 2}
+	for a := range c {
+		b = append(b, a[:])
+	}
+	t.Logf("%q", b)
+	b = nil
+	for _, a := range [][1]byte{{1}, {2}} {
+		b = append(b, a[:])
+	}
+	t.Logf("%q", b)
+	d := [1]byte{1}
+	e := d[:]
+	t.Logf("%q", e)
+	d[0] = 2
+	t.Logf("%q", e)
 }

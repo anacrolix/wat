@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"mime"
 	"net"
+	"net/url"
 	"reflect"
 	"strings"
 	"testing"
@@ -298,4 +299,8 @@ func TestSliceLoopVariableArray(t *testing.T) {
 	t.Logf("%q", e)
 	d[0] = 2
 	t.Logf("%q", e)
+}
+
+func TestQueryEscapeNul(t *testing.T) {
+	assert.EqualValues(t, "P%00%8E", url.QueryEscape("\x50\x00\x8e"))
 }

@@ -304,3 +304,13 @@ func TestSliceLoopVariableArray(t *testing.T) {
 func TestQueryEscapeNul(t *testing.T) {
 	assert.EqualValues(t, "P%00%8E", url.QueryEscape("\x50\x00\x8e"))
 }
+
+// struct{} values always have the same address.
+func TestEmptyStructEquality(t *testing.T) {
+	assert.True(t, struct{}{} == struct{}{})
+	assert.False(t, new(bool) == new(bool))
+	assert.True(t, new(struct{}) == new(struct{}))
+	assert.True(t, &struct{}{} == &struct{}{})
+	var a, b struct{}
+	assert.True(t, &a == &b)
+}

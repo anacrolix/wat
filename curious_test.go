@@ -314,3 +314,18 @@ func TestEmptyStructEquality(t *testing.T) {
 	var a, b struct{}
 	assert.True(t, &a == &b)
 }
+
+func TestDeferRecover(t *testing.T) {
+	f := func() (ret string) {
+		defer func() { recover() }()
+		ret = "default"
+		panic("fuck")
+	}
+	assert.Equal(t, "default", f())
+	g := func() (ret string) {
+		defer recover()
+		ret = "default"
+		panic("fuck")
+	}
+	assert.Panics(t, func() { g() })
+}

@@ -309,10 +309,10 @@ func TestQueryEscapeNul(t *testing.T) {
 func TestEmptyStructEquality(t *testing.T) {
 	assert.True(t, struct{}{} == struct{}{})
 	assert.False(t, new(bool) == new(bool))
-	assert.True(t, new(struct{}) == new(struct{}))
-	assert.True(t, &struct{}{} == &struct{}{})
+	assert.False(t, new(struct{}) == new(struct{}))
+	assert.False(t, &struct{}{} == &struct{}{})
 	var a, b struct{}
-	assert.True(t, &a == &b)
+	assert.False(t, &a == &b)
 }
 
 func TestDeferRecover(t *testing.T) {

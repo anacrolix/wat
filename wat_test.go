@@ -305,14 +305,8 @@ func TestQueryEscapeNul(t *testing.T) {
 	assert.EqualValues(t, "P%00%8E", url.QueryEscape("\x50\x00\x8e"))
 }
 
-// struct{} values always have the same address.
 func TestEmptyStructEquality(t *testing.T) {
-	assert.True(t, struct{}{} == struct{}{})
-	assert.False(t, new(bool) == new(bool))
-	assert.False(t, new(struct{}) == new(struct{}))
-	assert.False(t, &struct{}{} == &struct{}{})
-	var a, b struct{}
-	assert.False(t, &a == &b)
+	testEmptyStructEquality(t)
 }
 
 func TestDeferRecover(t *testing.T) {

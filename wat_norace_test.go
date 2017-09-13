@@ -1,6 +1,6 @@
 // +build !race
 
-package curious
+package wat
 
 import (
 	"runtime"

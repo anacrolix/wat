@@ -1,6 +1,6 @@
 // +build go1.9
 
-package curious
+package wat
 
 import (
 	"testing"

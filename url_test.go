@@ -1,4 +1,4 @@
-package curious
+package wat
 
 import (
 	"net/url"

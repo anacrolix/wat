@@ -13,7 +13,6 @@ import (
 	"unsafe"
 
 	_ "github.com/anacrolix/envpprof"
-
 	"github.com/bradfitz/iter"
 	"github.com/stretchr/testify/assert"
 )

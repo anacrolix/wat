@@ -7,11 +7,10 @@ import (
 	"net/url"
 	"testing"
 
-	"golang.org/x/net/websocket"
-
 	"github.com/anacrolix/missinggo/httptoo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/net/websocket"
 )
 
 func TestHttpServerHandlerRequestContextDone(t *testing.T) {

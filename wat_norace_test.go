@@ -3,7 +3,6 @@
 package wat
 
 import (
-	"runtime"
 	"sync"
 	"testing"
 
@@ -33,18 +32,4 @@ func TestSyncPoolZeroesItems(t *testing.T) {
 		}
 	}
 	t.Logf("got %d back", got)
-}
-
-func TestSliceStringsAllocation(t *testing.T) {
-	b := make([]byte, 1000000000)
-	for i := range b {
-		b[i] = byte(i)
-	}
-	s := string(b)
-	runtime.GC()
-	var ss []string
-	for i := range iter.N(1000) {
-		ss = append(ss, s[i:])
-	}
-	// time.Sleep(30 * time.Second)
 }

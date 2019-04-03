@@ -324,3 +324,15 @@ func TestDeferRecover(t *testing.T) {
 	}
 	assert.Panics(t, func() { g() })
 }
+
+// Check that default clauses are done last, even when the matching case comes afterwards.
+func TestSwitchDefaultNotLast(t *testing.T) {
+	i := 1
+	switch {
+	case i < 1:
+		t.FailNow()
+	default:
+		t.FailNow()
+	case i >= 1:
+	}
+}

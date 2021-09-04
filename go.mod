@@ -10,4 +10,10 @@ require (
 	gopkg.in/yaml.v2 v2.2.5 // indirect
 )
 
-go 1.13
+require (
+	github.com/anacrolix/log v0.3.0 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+)
+
+go 1.17

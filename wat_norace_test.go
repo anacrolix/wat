@@ -7,7 +7,8 @@ import (
 	"testing"
 
 	"github.com/bradfitz/iter"
-	"github.com/stretchr/testify/require"
+
+	"github.com/go-quicktest/qt"
 )
 
 func TestSyncPoolZeroesItems(t *testing.T) {
@@ -16,12 +17,12 @@ func TestSyncPoolZeroesItems(t *testing.T) {
 			return 42
 		},
 	}
-	require.EqualValues(t, 42, p.Get())
+	qt.Assert(t, qt.Equals(p.Get(), 42))
 	p.Put(1)
-	require.EqualValues(t, 1, p.Get())
-	require.EqualValues(t, 42, p.Get())
+	qt.Assert(t, qt.Equals(p.Get(), 1))
+	qt.Assert(t, qt.Equals(p.Get(), 42))
 	p.Put([]int{1, 2})
-	require.EqualValues(t, []int{1, 2}, p.Get())
+	qt.Assert(t, qt.DeepEquals[any](p.Get(), []int{1, 2}))
 	for range iter.N(100) {
 		p.Put(make([]byte, 100000))
 	}

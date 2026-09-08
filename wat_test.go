@@ -14,7 +14,8 @@ import (
 
 	_ "github.com/anacrolix/envpprof"
 	"github.com/bradfitz/iter"
-	"github.com/stretchr/testify/assert"
+
+	"github.com/go-quicktest/qt"
 )
 
 // Looks like if we append endlessly, we're given new backing arrays.
@@ -190,18 +191,18 @@ func TestFmtF(t *testing.T) {
 
 func TestFmtDFloat(t *testing.T) {
 	var f float64 = 42.123
-	assert.EqualValues(t, "42", fmt.Sprintf("%d", int(f)))
+	qt.Check(t, qt.Equals(fmt.Sprintf("%d", int(f)), "42"))
 }
 
 func TestInt64Wrap(t *testing.T) {
 	a := int64(1)
 	a += math.MaxInt64
-	assert.True(t, a < 0)
+	qt.Check(t, qt.IsTrue(a < 0))
 }
 
 func TestReflectCustomTypes(t *testing.T) {
 	type A []byte
-	assert.Equal(t, reflect.Slice, reflect.TypeOf(A{}).Kind())
+	qt.Check(t, qt.Equals(reflect.TypeOf(A{}).Kind(), reflect.Slice))
 }
 
 type A [1]byte
@@ -220,9 +221,9 @@ func TestTypedefExposedMethods(t *testing.T) {
 func TestAppendNilBytesNewBacking(t *testing.T) {
 	a := []byte{1, 2, 3}
 	b := append([]byte(nil), a...)
-	assert.EqualValues(t, a, b)
+	qt.Check(t, qt.DeepEquals(b, a))
 	b[1] = 4
-	assert.NotEqual(t, a, b)
+	qt.Check(t, qt.Not(qt.DeepEquals(b, a)))
 	t.Log(a)
 	t.Log(b)
 }
@@ -269,11 +270,11 @@ func (me *funcEqualityReceiver) Method() {}
 func TestFuncEquality(t *testing.T) {
 	a := func() {}
 	b := func() {}
-	// assert.NotEqual(t, a, b)
-	assert.NotEqual(t, reflect.ValueOf(a).Pointer(), reflect.ValueOf(b).Pointer())
+	// qt.Check(t, qt.Not(qt.Equals(b, a)))
+	qt.Check(t, qt.Not(qt.Equals(reflect.ValueOf(b).Pointer(), reflect.ValueOf(a).Pointer())))
 	// var objA funcEqualityReceiver
 	// var objB funcEqualityReceiver
-	// assert.NotEqual(t, objA.Method, objB.Method)
+	// qt.Check(t, qt.Not(qt.Equals(objB.Method, objA.Method)))
 }
 
 func TestReturnTuple(t *testing.T) {
@@ -303,7 +304,7 @@ func TestSliceLoopVariableArray(t *testing.T) {
 }
 
 func TestQueryEscapeNul(t *testing.T) {
-	assert.EqualValues(t, "P%00%8E", url.QueryEscape("\x50\x00\x8e"))
+	qt.Check(t, qt.Equals(url.QueryEscape("\x50\x00\x8e"), "P%00%8E"))
 }
 
 func TestEmptyStructEquality(t *testing.T) {
@@ -316,13 +317,13 @@ func TestDeferRecover(t *testing.T) {
 		ret = "default"
 		panic("fuck")
 	}
-	assert.Equal(t, "default", f())
+	qt.Check(t, qt.Equals(f(), "default"))
 	g := func() (ret string) {
 		defer recover()
 		ret = "default"
 		panic("fuck")
 	}
-	assert.Panics(t, func() { g() })
+	qt.Check(t, qt.PanicMatches(func() { g() }, ".*"))
 }
 
 // Check that default clauses are done last, even when the matching case comes afterwards.

@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/go-quicktest/qt"
 )
 
 // Tests that time.AfterFunc with a negative duration still schedules the
@@ -16,8 +16,8 @@ func TestTimeAfterFunc(t *testing.T) {
 	}
 	tmr := time.AfterFunc(-1, f)
 	<-ch
-	assert.False(t, tmr.Stop())
+	qt.Check(t, qt.IsFalse(tmr.Stop()))
 	tmr.Reset(-1)
 	<-ch
-	assert.False(t, tmr.Stop())
+	qt.Check(t, qt.IsFalse(tmr.Stop()))
 }

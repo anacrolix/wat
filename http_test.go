@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/anacrolix/missinggo/httptoo"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"golang.org/x/net/websocket"
+
+	"github.com/go-quicktest/qt"
 )
 
 func TestHttpServerHandlerRequestContextDone(t *testing.T) {
@@ -38,9 +38,9 @@ func TestHttpServerHandlerRequestContextDone(t *testing.T) {
 		}
 	}))
 	r, err := http.Get(s.URL)
-	require.NoError(t, err)
+	qt.Assert(t, qt.IsNil(err))
 	<-handlerRunning
-	assert.NoError(t, r.Body.Close())
+	qt.Check(t, qt.IsNil(r.Body.Close()))
 	<-handlerDone
 }
 
@@ -57,19 +57,19 @@ func TestWebSocketRequestContextDone(t *testing.T) {
 			}
 			close(serverHasConn)
 			_, err := ws.Read(nil)
-			assert.Equal(t, io.EOF, err)
+			qt.Check(t, qt.Equals(err, io.EOF))
 			// Expect this to close when the websocket is Closed.
 			// <-r.Context().Done()
 		}).ServeHTTP(w, r)
 	}))
 	u, err := url.Parse(s.URL)
-	require.NoError(t, err)
+	qt.Assert(t, qt.IsNil(err))
 	u = httptoo.AppendURL(u, &url.URL{
 		Scheme: "ws",
 	})
 	ws, err := websocket.Dial(u.String(), "", s.URL)
-	require.NoError(t, err)
+	qt.Assert(t, qt.IsNil(err))
 	<-serverHasConn
-	assert.NoError(t, ws.Close())
+	qt.Check(t, qt.IsNil(ws.Close()))
 	<-handlerDone
 }
